@@ -1,0 +1,111 @@
+     CREATE TABLE public.country
+       (
+    countrycode character(3)  NOT NULL,
+    countryname character varying(20)  NOT NULL,
+    CONSTRAINT country_pkey PRIMARY KEY (countrycode)
+        );
+    
+     CREATE TABLE public.players
+(
+    playerid numeric(8,0) NOT NULL,
+    playername character varying(20) NOT NULL,
+    pdob date NOT NULL,
+    gender character(1)  NOT NULL,
+    pmobile numeric(10,0),
+    countrycode character(3) NOT NULL,
+    CONSTRAINT players_pkey PRIMARY KEY (playerid),
+    CONSTRAINT players_countrycode_fkey FOREIGN KEY (countrycode)
+        REFERENCES public.country (countrycode) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+
+    CREATE TABLE public.teams
+(
+    teamid numeric(7,0) NOT NULL,
+    totalplayer integer NOT NULL,
+    CONSTRAINT teams_pkey PRIMARY KEY (teamid)
+);
+
+    CREATE TABLE public.teamparticipation
+(
+    teamid numeric(7,0) NOT NULL,
+    playerid numeric(8,0) NOT NULL,
+    CONSTRAINT teamparticipation_pkey PRIMARY KEY (teamid, playerid),
+    CONSTRAINT teamparticipation_playerid_fkey FOREIGN KEY (playerid)
+        REFERENCES public.players (playerid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT,
+    CONSTRAINT teamparticipation_teamid_fkey FOREIGN KEY (teamid)
+        REFERENCES public.teams (teamid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT
+);
+
+    CREATE TABLE public.participation
+(
+    teamid numeric(3,0) NOT NULL,
+    sportid numeric(3,0) NOT NULL,
+    record character varying(20)  NOT NULL,
+    result character varying(20) ,
+    CONSTRAINT participation_pkey PRIMARY KEY (teamid, sportid),
+    CONSTRAINT participationin_sportid_fkey FOREIGN KEY (sportid)
+        REFERENCES public.sports (sportid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT,
+    CONSTRAINT participationin_teamid_fkey FOREIGN KEY (teamid)
+        REFERENCES public.teams (teamid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT
+);'
+
+
+   CREATE TABLE public.sports
+(
+    sportid numeric(6,0) NOT NULL,
+    sporttype character varying(30) NOT NULL,
+    sportname character varying(30)  NOT NULL,
+    scheduleid numeric(5,0) NOT NULL,
+    siteid numeric(6,0) NOT NULL,
+    CONSTRAINT sports_pkey PRIMARY KEY (sportid),
+    CONSTRAINT sports_scheduleid_fkey FOREIGN KEY (scheduleid)
+        REFERENCES public.schedule (scheduleid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT,
+    CONSTRAINT sports_siteid_fkey FOREIGN KEY (siteid)
+        REFERENCES public.site (siteid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET DEFAULT
+);
+
+
+    CREATE TABLE public.schedule
+(
+    scheduleid numeric(5,0) NOT NULL,
+    sdate date NOT NULL,
+    sday character varying NOT NULL,
+    stime time without time zone NOT NULL,
+    CONSTRAINT schedule_pkey PRIMARY KEY (scheduleid)
+);
+
+
+  CREATE TABLE public.site
+(
+    siteid numeric(6,0) NOT NULL,
+    court character varying(50) NOT NULL,
+    venue character varying(40)  NOT NULL,
+    city character varying(30)  NOT NULL,
+    CONSTRAINT site_pkey PRIMARY KEY (siteid)
+);
+
+
+   CREATE TABLE public.playeremailid
+(
+    pmailid character varying(40)  NOT NULL,
+    playerid numeric(8,0) NOT NULL,
+    CONSTRAINT playeremailid_pkey PRIMARY KEY (pmailid, playerid),
+    CONSTRAINT playeremailid_playerid_fkey FOREIGN KEY (playerid)
+        REFERENCES public.players (playerid) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
